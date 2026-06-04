@@ -226,7 +226,7 @@
       }, 0);
     });
  
-    // ---- Global error handler (Step 5) ----
+    //Global error handler (Step 5)
     window.onerror = function(message, source, lineno, colno, error) {
       console.log('window.onerror caught a global error!');
       console.log('message:', message);
@@ -236,7 +236,7 @@
       return false;
     };
  
-    // ---- Custom error classes (Step 4) ----
+    // Custom error classes
     class ValidationError extends Error {
       constructor(message) {
         super(message);
