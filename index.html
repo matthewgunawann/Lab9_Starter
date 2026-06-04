@@ -6,6 +6,15 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lab 9</title>
+  
+<script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
+<script>
+  window.TrackJS && TrackJS.install({ 
+    token: "38ba5efe3a644ac1a7a11a3d5687ae4c",
+    application: "lab9"
+    // for more configuration options, see https://docs.trackjs.com
+  });
+</script>
 
   <style>
     button {
@@ -95,13 +104,176 @@
       let firstNum = document.querySelector('#first-num').value;
       let secondNum = document.querySelector('#second-num').value;
       let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      
+      // try/catch around eval since the inputs could be empty or invalid
+      try {
+        if (firstNum === '' || secondNum === '') {
+          throw new Error('Please enter both numbers before calculating');
+        }
+        let result = eval(`${firstNum} ${operator} ${secondNum}`);
+        if (!isFinite(result)) {
+          throw new Error('Result is not finite (divide by zero?)');
+        }
+        output.innerHTML = result;
+      } catch (e) {
+        output.innerHTML = 'Error: ' + e.message;
+        console.error('Calculator error:', e);
+      } finally {
+        console.log('calculate attempted');
+      }
+    });
+ 
+    let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
+ 
+    // some dummy data to use across the demos
+    let sampleData = [
+      { name: 'Alice', score: 91, grade: 'A' },
+      { name: 'Bob',   score: 74, grade: 'C' },
+      { name: 'Carol', score: 88, grade: 'B' },
+    ];
+ 
+    // Console Log
+    errorBtns[0].addEventListener('click', () => {
+      console.log('console.log demo - sampleData:', sampleData);
+    });
+ 
+    // Console Error
+    errorBtns[1].addEventListener('click', () => {
+      console.error('console.error demo - something went wrong!');
+    });
+ 
+    // Console Count
+    errorBtns[2].addEventListener('click', () => {
+      console.count('button clicked');
+    });
+ 
+    // Console Warn
+    errorBtns[3].addEventListener('click', () => {
+      console.warn('console.warn demo - this is a warning');
+    });
+ 
+    // Console Assert
+    errorBtns[4].addEventListener('click', () => {
+      // first assert passes (no output), second one fails and prints message
+      console.assert(1 + 1 === 2, 'math is broken');
+      console.assert(1 + 1 === 3, 'assertion failed: 1+1 should not equal 3');
+    });
+ 
+    // Console Clear
+    errorBtns[5].addEventListener('click', () => {
+      console.clear();
+    });
+ 
+    // Console Dir
+    errorBtns[6].addEventListener('click', () => {
+      // dir on a DOM element shows its properties
+      let btn = document.querySelector('#calculate');
+      console.dir(btn);
+    });
+ 
+    // Console dirxml
+    errorBtns[7].addEventListener('click', () => {
+      let fieldset = document.querySelector('fieldset');
+      console.dirxml(fieldset);
+    });
+ 
+    // Console Group Start
+    errorBtns[8].addEventListener('click', () => {
+      console.group('student scores');
+      sampleData.forEach(student => {
+        console.log(student.name + ': ' + student.score);
+      });
+      // group is left open on purpose - click Group End to close it
+    });
+ 
+    // Console Group End
+    errorBtns[9].addEventListener('click', () => {
+      console.groupEnd();
+    });
+ 
+    // Console Table
+    errorBtns[10].addEventListener('click', () => {
+      console.table(sampleData);
+    });
+ 
+    // Start Timer
+    errorBtns[11].addEventListener('click', () => {
+      console.time('myTimer');
+      console.log('timer started');
+    });
+ 
+    // End Timer
+    errorBtns[12].addEventListener('click', () => {
+      console.timeEnd('myTimer');
+    });
+ 
+    // Console Trace
+    errorBtns[13].addEventListener('click', () => {
+      function inner() {
+        console.trace('trace from inner function');
+      }
+      function outer() {
+        inner();
+      }
+      outer();
+    });
+ 
+    // Trigger a Global Error
+    errorBtns[14].addEventListener('click', () => {
+      // throw an error outside try/catch so window.onerror catches it
+      setTimeout(() => {
+        notDefinedVariable.doSomething();
+      }, 0);
+    });
+ 
+    // ---- Global error handler (Step 5) ----
+    window.onerror = function(message, source, lineno, colno, error) {
+      console.log('window.onerror caught a global error!');
+      console.log('message:', message);
+      console.log('source:', source);
+      console.log('line:', lineno, 'col:', colno);
+      // returning false lets the error still show up in the console normally
+      return false;
+    };
+ 
+    // ---- Custom error classes (Step 4) ----
+    class ValidationError extends Error {
+      constructor(message) {
+        super(message);
+        this.name = 'ValidationError';
+      }
+    }
+ 
+    class RangeError2 extends Error {
+      constructor(message) {
+        super(message);
+        this.name = 'RangeError2';
+      }
+    }
+ 
+    // demo of throw + custom errors triggered by the calculator
+    // if someone types a negative number we throw a custom RangeError2
+    document.querySelector('#calculate').addEventListener('click', () => {
+      let firstNum = document.querySelector('#first-num').value;
+      let secondNum = document.querySelector('#second-num').value;
+      try {
+        if (firstNum < 0 || secondNum < 0) {
+          throw new RangeError2('Negative numbers are not allowed in this demo');
+        }
+        if (isNaN(firstNum) || isNaN(secondNum)) {
+          throw new ValidationError('Inputs must be numbers');
+        }
+      } catch (e) {
+        if (e instanceof ValidationError) {
+          console.warn('Caught a ValidationError:', e.message);
+        } else if (e instanceof RangeError2) {
+          console.warn('Caught a RangeError2:', e.message);
+        } else {
+          console.error('Unknown error:', e);
+        }
+      }
     });
 
-    let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
-
-    // Start your code here
-    // You may move this JS to another file if you wish
   </script>
 </body>
 
